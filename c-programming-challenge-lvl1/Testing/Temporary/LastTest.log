@@ -1,0 +1,19 @@
+Start testing: Oct 26 20:31 EDT
+----------------------------------------------------------
+Unable to find executable: onboarding-tests
+1/1 Testing: onboarding-tests
+1/1 Test: onboarding-tests
+Command: ""
+Directory: /Users/caija2/UWaterloo/Clubs/UWOrbital/c-programming-challenge-lvl1/test
+"onboarding-tests" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"onboarding-tests" end time: Oct 26 20:31 EDT
+"onboarding-tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 26 20:31 EDT

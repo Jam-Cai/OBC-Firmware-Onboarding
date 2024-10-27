@@ -1,0 +1,16 @@
+name: level1-challenge-test
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Build Application
+      run: make all
+    - name: Run Tests
+      run: ./build/challenge

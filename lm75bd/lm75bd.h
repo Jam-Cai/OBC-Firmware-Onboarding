@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 /* LM75BD I2C Device Address */
-#define LM75BD_OBC_I2C_ADDR /* Define the address here */
+#define LM75BD_OBC_I2C_ADDR 0b1001111
 
 /* LM75BD Configuration Values */
 #define LM75BD_DEV_OP_MODE_NORMAL 0x00U
@@ -16,6 +16,8 @@
 
 #define LM75BD_OS_OP_MODE_COMP 0x00U
 #define LM75BD_OS_OP_MODE_INT 0x01U
+
+
 
 // Default temperature thresholds
 #define LM75BD_DEFAULT_OT_THRESH 80.0f
