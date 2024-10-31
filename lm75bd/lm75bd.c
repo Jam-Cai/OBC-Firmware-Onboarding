@@ -30,7 +30,7 @@ error_code_t readTempLM75BD(uint8_t devAddr, float *temp) {
   if (temp == NULL) return ERR_CODE_INVALID_ARG;
   
   uint8_t writeBuf[1] = {0};
-  uint8_t readBuf[2];
+  uint8_t readBuf[2] = {0};
   
   error_code_t errCode;
   RETURN_IF_ERROR_CODE(i2cSendTo(devAddr, writeBuf, sizeof(writeBuf)));
