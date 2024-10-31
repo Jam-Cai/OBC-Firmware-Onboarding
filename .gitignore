@@ -59,3 +59,8 @@ dkms.conf
 venv/
 
 build*
+
+
+# Misc. files
+c-programming-challenge-lvl1/
+Testing/

@@ -2,6 +2,7 @@
 #include "errors.h"
 #include "lm75bd.h"
 #include "console.h"
+#include "logging.h"
 
 #include <FreeRTOS.h>
 #include <os_task.h>
@@ -42,6 +43,9 @@ void initThermalSystemManager(lm75bd_config_t *config) {
 }
 
 error_code_t thermalMgrSendEvent(thermal_mgr_event_t *event) {
+  if (thermalMgrQueueHandle == NULL)  return ERR_CODE_INVALID_STATE;
+  if (event == NULL) return ERR_CODE_INVALID_ARG;
+  
   if (xQueueSend(thermalMgrQueueHandle, event, (TickType_t) 0) != pdPASS) {
     return ERR_CODE_QUEUE_FULL;
   }
@@ -49,31 +53,38 @@ error_code_t thermalMgrSendEvent(thermal_mgr_event_t *event) {
 }
 
 void osHandlerLM75BD(void) {
-  /* Implement this function */
-  thermal_mgr_event_t event = { .type = OS_HANDLER_CHECK_OVER_TEMP };
-  xQueueSend(thermalMgrQueueHandle, &event, (TickType_t) 0);
+  thermal_mgr_event_t event = { .type = THERMAL_MGR_OS_INTERRUPT };
+  thermalMgrSendEvent(&event);
 }
 
 static void thermalMgr(void *pvParameters) {
-  /* Implement this task */
-  thermal_mgr_event_t buf;
-  float temp;
   while (1) {
-    if (xQueueReceive(thermalMgrQueueHandle, &(buf), ( TickType_t ) 10) == pdTRUE) {
-      if (buf.type == THERMAL_MGR_EVENT_MEASURE_TEMP_CMD) {
-        if (readTempLM75BD(LM75BD_OBC_I2C_ADDR, &temp) == ERR_CODE_SUCCESS) {
-          addTemperatureTelemetry(temp);
-        }
-      }
-    } else if (buf.type == OS_HANDLER_CHECK_OVER_TEMP) {
-        if (readTempLM75BD(LM75BD_OBC_I2C_ADDR, &temp) == ERR_CODE_SUCCESS) {
-          if (temp > TEMP_HYS) {
+    thermal_mgr_event_t currentEvent;
+    if (xQueueReceive(thermalMgrQueueHandle, &(currentEvent), portMAX_DELAY) == pdTRUE) {
+      if (currentEvent.type == THERMAL_MGR_OS_INTERRUPT) {
+        float temp; 
+        error_code_t errCode; 
+
+        LOG_IF_ERROR_CODE(readTempLM75BD(LM75BD_OBC_I2C_ADDR, &temp));
+        if (errCode == ERR_CODE_SUCCESS) {
+          if (temp > LM75BD_DEFAULT_HYST_THRESH) {
             overTemperatureDetected();
           } else {
             safeOperatingConditions();
           }
+        }  
+      } 
+      
+      else if (currentEvent.type == THERMAL_MGR_EVENT_MEASURE_TEMP_CMD) {
+          float temp;
+          error_code_t errCode;
+           
+          LOG_IF_ERROR_CODE(readTempLM75BD(LM75BD_OBC_I2C_ADDR, &temp));
+          if (errCode == ERR_CODE_SUCCESS) {
+            addTemperatureTelemetry(temp);
         }
-    }
+      }
+    }  
   }
 }
 
